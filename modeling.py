@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(style='white', context='notebook', palette='deep')
-import time
 
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, ExtraTreesClassifier, VotingClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     '''
     使用交叉验证法进行模型选择
     '''
-#     random_state = 2 # 很多模型都需要一个随机的设定（比如迭代的初始值等等）。random_state的作用就是固定这个随机设定。调参的时候，这个random_state通常是固定好不变的。
+    random_state = 2 # 很多模型都需要一个随机的设定（比如迭代的初始值等等）。random_state的作用就是固定这个随机设定。调参的时候，这个random_state通常是固定好不变的。
 #     classifiers = []
 #     classifiers.append(SVC(random_state=random_state))
 #     classifiers.append(DecisionTreeClassifier(random_state=random_state))
@@ -60,11 +59,11 @@ if __name__ == '__main__':
 #     g = g.set_title("Cross validation scores")
 #     plt.show()
 
-    # 最终选择 RandomForest,ExtraTrees,GradientBoosting这3个分类器做ensemble
+    # 最终选择 RandomForest,ExtraTrees,GradientBoosting,LR,LDA这5个分类器做ensemble
 
-    '''
-    调参
-    '''
+    # '''
+    # 调参
+    # '''
     # ExtraTrees
     print("training ExtraTrees...")
     ExtC = ExtraTreesClassifier()
@@ -114,8 +113,8 @@ if __name__ == '__main__':
     Ensemble modeling
     '''
     print("Ensemble modeling...")
-    votingC = VotingClassifier(estimators=[('RF', RFC_best), ('EXT', ExtC_best), ('GBDT', GBC_best)], voting='soft',
-                               n_jobs=4)
+    votingC = VotingClassifier(estimators=[('RF', RFC_best), ('EXT', ExtC_best), ('GBDT', GBC_best), ('LDA', LogisticRegression(random_state=random_state)),
+                                           ('LR', LogisticRegression())], voting='soft', n_jobs=4)
     votingC = votingC.fit(X_train, Y_train)
     # Predict and Submit results
     print("predicting...")
