@@ -27,9 +27,9 @@ if __name__ == '__main__':
     X_train = train.drop(labels=["Survived"], axis=1)
 
     kfold = StratifiedKFold(n_splits=10)
-#     '''
-#     使用交叉验证法进行模型选择
-#     '''
+    '''
+    使用交叉验证法进行模型选择
+    '''
 #     random_state = 2 # 很多模型都需要一个随机的设定（比如迭代的初始值等等）。random_state的作用就是固定这个随机设定。调参的时候，这个random_state通常是固定好不变的。
 #     classifiers = []
 #     classifiers.append(SVC(random_state=random_state))
@@ -46,10 +46,12 @@ if __name__ == '__main__':
 #
 #     cv_results = []
 #     for classifier in classifiers:
+#         print("training ", classifier, "...")
 #         cv_results.append(cross_val_score(classifier, X_train, y=Y_train, scoring="accuracy", cv=kfold, n_jobs=4))
 #     cv_means = []
 #     for cv_result in cv_results:
 #         cv_means.append(cv_result.mean())
+#     print(cv_means)
 #     # 画图
 #     cv_res = pd.DataFrame({"CrossValMeans": cv_means, "Algorithm": ["SVC","DecisionTree","AdaBoost",
 # "RandomForest","ExtraTrees","GradientBoosting","MultipleLayerPerceptron","KNeighboors","LogisticRegression","LinearDiscriminantAnalysis"]})
@@ -58,36 +60,11 @@ if __name__ == '__main__':
 #     g = g.set_title("Cross validation scores")
 #     plt.show()
 
-    # 最终选择SVC, AdaBoost, RandomForest , ExtraTrees和GradientBoosting这5个分类器做ensemble
+    # 最终选择 RandomForest,ExtraTrees,GradientBoosting这3个分类器做ensemble
 
     '''
     调参
     '''
-    ### SVC
-    print("training SVC...")
-    SVMC = SVC(probability=True)
-    svc_param_grid = {'kernel': ['rbf'],
-                      'gamma': [0.001, 0.01, 0.1, 1],
-                      'C': [1, 10, 50, 100, 200, 300, 1000]}
-    gsSVMC = GridSearchCV(SVMC, param_grid=svc_param_grid, cv=kfold, scoring="accuracy", n_jobs=4, verbose=1)
-    gsSVMC.fit(X_train, Y_train)
-    SVMC_best = gsSVMC.best_estimator_
-    print("SVC best accuracy score：", gsSVMC.best_score_)
-
-    # Adaboost
-    print("training Adaboost...")
-    DTC = DecisionTreeClassifier()
-    adaDTC = AdaBoostClassifier(DTC, random_state=7)
-    ada_param_grid = {"base_estimator__criterion": ["gini", "entropy"],
-                      "base_estimator__splitter": ["best", "random"],
-                      "algorithm": ["SAMME", "SAMME.R"],
-                      "n_estimators": [1, 2],
-                      "learning_rate": [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 1.5]}
-    gsadaDTC = GridSearchCV(adaDTC, param_grid=ada_param_grid, cv=kfold, scoring="accuracy", n_jobs=4, verbose=1)
-    gsadaDTC.fit(X_train, Y_train)
-    ada_best = gsadaDTC.best_estimator_
-    print("Adaboost best accuracy score：", gsadaDTC.best_score_)
-
     # ExtraTrees
     print("training ExtraTrees...")
     ExtC = ExtraTreesClassifier()
@@ -137,13 +114,12 @@ if __name__ == '__main__':
     Ensemble modeling
     '''
     print("Ensemble modeling...")
-    votingC = VotingClassifier(estimators=[('rfc', RFC_best), ('extc', ExtC_best),
-                                           ('svc', SVMC_best), ('adac', ada_best), ('gbc', GBC_best)], voting='soft',
+    votingC = VotingClassifier(estimators=[('RF', RFC_best), ('EXT', ExtC_best), ('GBDT', GBC_best)], voting='soft',
                                n_jobs=4)
     votingC = votingC.fit(X_train, Y_train)
     # Predict and Submit results
     print("predicting...")
     test_Survived = pd.Series(votingC.predict(test), name="Survived")
-    IDtest = pd.read_csv("../input/test.csv")["PassengerId"]
+    IDtest = pd.read_csv("./data/test.csv")["PassengerId"]
     results = pd.concat([IDtest, test_Survived], axis=1)
     results.to_csv("./data/results.csv", index=False)
