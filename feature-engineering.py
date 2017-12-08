@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 from collections import Counter
+from sklearn.neighbors import LocalOutlierFactor
 
 if __name__ == '__main__':
 
@@ -10,7 +11,7 @@ if __name__ == '__main__':
     train = pd.read_csv('./data/train.csv', header=0)
     test = pd.read_csv('./data/test.csv', header=0)
 
-    # Outlier detection
+    # Outlier detection ，这里也可用LOF异常检测法（sklearn.neighbors.LocalOutlierFactor）
     def detect_outliers(df, n, features):
         """
         Takes a dataframe df of features and returns a list of the indices
@@ -40,10 +41,20 @@ if __name__ == '__main__':
         multiple_outliers = list(k for k, v in outlier_indices.items() if v > n)
         return multiple_outliers
 
+    # def detect_outliers(X):
+    #     clf = LocalOutlierFactor(n_neighbors=20)
+    #     y_pred = clf.fit_predict(X)  ## 预测为1则为正常样本，-1为异常样本
+    #     outlier = []
+    #     for i, j in enumerate(y_pred):
+    #         if j == -1:
+    #             outlier.append(i)  ##　获取所有异常样本
+    #     return outlier
+
     Outliers_to_drop = detect_outliers(train, 2, ["Age", "SibSp", "Parch", "Fare"])
-    # print(train.loc[Outliers_to_drop])
+    print(train.loc[Outliers_to_drop])
     # Drop outliers
     train = train.drop(Outliers_to_drop, axis=0).reset_index(drop=True)
+
 
     # joining train and test set
     train_len = len(train)
