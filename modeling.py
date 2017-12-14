@@ -13,6 +13,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
+from xgboost.sklearn  import XGBClassifier
 from sklearn.model_selection import GridSearchCV, cross_val_score, StratifiedKFold
 
 
@@ -30,19 +31,20 @@ if __name__ == '__main__':
     使用交叉验证法进行模型选择
     '''
     random_state = 2 # 很多模型都需要一个随机的设定（比如迭代的初始值等等）。random_state的作用就是固定这个随机设定。调参的时候，这个random_state通常是固定好不变的。
-#     classifiers = []
-#     classifiers.append(SVC(random_state=random_state))
-#     classifiers.append(DecisionTreeClassifier(random_state=random_state))
-#     classifiers.append(AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state), random_state=random_state,
-#                                           learning_rate=0.1))
-#     classifiers.append(RandomForestClassifier(random_state=random_state))
-#     classifiers.append(ExtraTreesClassifier(random_state=random_state))
-#     classifiers.append(GradientBoostingClassifier(random_state=random_state))
-#     classifiers.append(MLPClassifier(random_state=random_state))
-#     classifiers.append(KNeighborsClassifier())
-#     classifiers.append(LogisticRegression(random_state=random_state))
-#     classifiers.append(LinearDiscriminantAnalysis())
-#
+    classifiers = []
+    # classifiers.append(XGBClassifier(max_depth=2, learning_rate=1))
+    # classifiers.append(SVC(random_state=random_state))
+    # classifiers.append(DecisionTreeClassifier(random_state=random_state))
+    # classifiers.append(AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state), random_state=random_state,
+    #                                       learning_rate=0.1))
+    # classifiers.append(RandomForestClassifier(random_state=random_state))
+    # classifiers.append(ExtraTreesClassifier(random_state=random_state))
+    # classifiers.append(GradientBoostingClassifier(random_state=random_state))
+    # classifiers.append(MLPClassifier(random_state=random_state))
+    # classifiers.append(KNeighborsClassifier())
+    # classifiers.append(LogisticRegression(random_state=random_state))
+    # classifiers.append(LinearDiscriminantAnalysis())
+
 #     cv_results = []
 #     for classifier in classifiers:
 #         print("training ", classifier, "...")
@@ -57,7 +59,7 @@ if __name__ == '__main__':
 #     g = sns.barplot("CrossValMeans", "Algorithm", data=cv_res, palette="Set3", orient="h")
 #     g.set_xlabel("Mean Accuracy")
 #     g = g.set_title("Cross validation scores")
-#     plt.show()
+    plt.show()
 
     # 最终选择 RandomForest,ExtraTrees,GradientBoosting,LR,LDA这5个分类器做ensemble
 
